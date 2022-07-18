@@ -55,7 +55,7 @@ class FollowTests(TestCase):
             )
         )
         unfollow_count = Follow.objects.count()
-        self.assertEqual(follow_count, unfollow_count)
+        self.assertEqual(follow_count, unfollow_count + 1)
 
     def test_followed_author_post_in_post_list(self):
         response = self.authorized_client.get(reverse('posts:follow_index'))
