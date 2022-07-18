@@ -76,3 +76,4 @@ class FollowTests(TestCase):
         response = self.author_client.get(reverse('posts:follow_index'))
         posts_new_count = len(response.context['page_obj'])
         self.assertEqual(posts_count, posts_new_count)
+        
