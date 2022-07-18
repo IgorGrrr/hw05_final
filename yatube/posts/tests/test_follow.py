@@ -54,8 +54,8 @@ class FollowTests(TestCase):
                 kwargs={'username': self.author}
             )
         )
-        
-        self.assertNotEqual(Follow.objects.count(), follow_count - 1)
+        unfollow_count = Follow.objects.count()
+        self.assertEqual(follow_count, unfollow_count)
 
     def test_followed_author_post_in_post_list(self):
         response = self.authorized_client.get(reverse('posts:follow_index'))
@@ -76,4 +76,3 @@ class FollowTests(TestCase):
         response = self.author_client.get(reverse('posts:follow_index'))
         posts_new_count = len(response.context['page_obj'])
         self.assertEqual(posts_count, posts_new_count)
-        

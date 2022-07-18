@@ -128,3 +128,4 @@ def profile_unfollow(request, username):
     if request.user != author:
         follow.delete()
     return redirect('posts:profile', username=username)
+    
