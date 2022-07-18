@@ -50,6 +50,7 @@ class PostsPagesTests(TestCase):
             group=cls.group,
             image=cls.uploaded
         )
+
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()

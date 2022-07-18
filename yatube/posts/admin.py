@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import *
-
+from .models import Post, Comment, Follow
 
 
 @admin.register(Post)
@@ -40,6 +39,3 @@ class FollowAdmin(admin.ModelAdmin):
         'user',
         'author',
     )
-
-
-admin.site.register(Group)

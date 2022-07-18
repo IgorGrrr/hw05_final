@@ -1,8 +1,5 @@
-from cgitb import text
-from multiprocessing import AuthenticationError
 from django.db import models
 from django.contrib.auth import get_user_model
-from requests import post
 
 
 User = get_user_model()
@@ -91,8 +88,9 @@ class Follow(models.Model):
         verbose_name='Автор'
     )
 
+
 class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['user', 'author'],
-                                    name='unique_follow')
+    constraints = [
+    models.UniqueConstraint(fields=['user', 'author'],
+                                name='unique_follow')
         ]

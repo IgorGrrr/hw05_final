@@ -6,6 +6,7 @@ from .utils import paginator
 from django.views.decorators.cache import cache_page
 from django.conf import settings
 
+
 @cache_page(settings.CACHE_TIME)
 def index(request):
     post_list = (Post.objects.select_related('author')
@@ -114,12 +115,14 @@ def follow_index(request):
     }
     return render(request, 'posts/follow.html', context)
 
+
 @login_required
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
     if request.user != author:
         Follow.objects.get_or_create(user=request.user, author=author)
     return redirect('posts:profile', username=username)
+
 
 @login_required
 def profile_unfollow(request, username):
@@ -128,4 +131,3 @@ def profile_unfollow(request, username):
     if request.user != author:
         follow.delete()
     return redirect('posts:profile', username=username)
-    

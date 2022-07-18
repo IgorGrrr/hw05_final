@@ -37,6 +37,7 @@ class PostURLTests(TestCase):
             f'/posts/{cls.post.id}/edit/': 'posts/create_post.html',
             '/unexisting_page/': 'core/404.html'
         }
+
     def setUp(self):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
