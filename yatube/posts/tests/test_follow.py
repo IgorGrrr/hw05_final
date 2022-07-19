@@ -40,8 +40,8 @@ class FollowTests(TestCase):
         )
         follow_guest_redirect = (
             reverse('users:login') + '?next='
-            + reverse('posts:profile_follow',
-            kwargs={'username': self.user})
+                + reverse('posts:profile_follow',
+                kwargs={'username': self.user})
         )
         self.assertEqual(Follow.objects.count(), follow_count)
         self.assertRedirects(response, follow_guest_redirect)
