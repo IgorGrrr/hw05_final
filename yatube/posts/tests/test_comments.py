@@ -4,11 +4,12 @@ from django.test import Client, TestCase
 from django.urls import reverse
 
 from ..models import Comment, Group, Post
+from ..forms import CommentForm
 
 User = get_user_model()
 
 
-class PostContextTests(TestCase):
+class PostCommentsTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -23,11 +24,7 @@ class PostContextTests(TestCase):
             author=cls.user,
             group=cls.group,
         )
-        cls.comment = Comment.objects.create(
-            text='test comment',
-            author=cls.post.author,
-            post=cls.post
-        )
+        cls.form = CommentForm()
 
     def setUp(self):
         self.guest_client = Client()
@@ -38,8 +35,7 @@ class PostContextTests(TestCase):
         comment_count = Comment.objects.count()
 
         form_data = {
-            'text': self.comment.text,
-            'author': self.comment.author,
+            'text': 'Test comment',
         }
         response = self.guest_client.post(
             reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
@@ -56,7 +52,7 @@ class PostContextTests(TestCase):
         comment_count = Comment.objects.count()
 
         form_data = {
-            'text': self.comment.text,
+            'text': 'Test comment',
         }
         response = self.authorized_client.post(
             reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
@@ -69,16 +65,3 @@ class PostContextTests(TestCase):
         last_object = Comment.objects.latest('id')
         self.assertEqual(form_data['text'], last_object.text)
 
-    def test_home_page_cache(self):
-        Post.objects.create(text='Тестовый текст',
-                            author=self.user,
-                            group=self.group
-                            )
-        response = self.guest_client.get(reverse('posts:home'))
-        last_object = Post.objects.latest('id')
-        last_object.delete()
-        response_cache = self.guest_client.get(reverse('posts:home'))
-        cache.clear()
-        response_no_cache = self.guest_client.get(reverse('posts:home'))
-        self.assertEqual(response.content, response_cache.content)
-        self.assertNotEqual(response.content, response_no_cache.content)

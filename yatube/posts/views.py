@@ -61,7 +61,8 @@ def post_detail(request, post_id):
 
 @login_required
 def create_post(request):
-    form = PostForm(request.POST or None)
+    form = PostForm(request.POST or None, 
+                    files=request.FILES or None)
     if form.is_valid():
         post = form.save(commit=False)
         post.author = request.user
@@ -127,7 +128,6 @@ def profile_follow(request, username):
 @login_required
 def profile_unfollow(request, username):
     author = get_object_or_404(User, username=username)
-    follow = Follow.objects.get(user=request.user, author=author)
-    if request.user != author:
-        follow.delete()
+    follow = Follow.objects.filter(user=request.user, author=author)
+    follow.delete()
     return redirect('posts:profile', username=username)

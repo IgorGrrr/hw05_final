@@ -30,6 +30,22 @@ class FollowTests(TestCase):
         self.author_client = Client()
         self.author_client.force_login(self.author)
 
+    def test_guest_client_cannot_follow(self):
+        follow_count = Follow.objects.count()
+        response = self.guest_client.get(
+            reverse(
+                'posts:profile_follow',
+                kwargs={'username': self.user}
+            )
+        )
+        follow_guest_redirect = (
+            reverse('users:login') + '?next='
+            + reverse('posts:profile_follow',
+            kwargs={'username': self.user})
+        )
+        self.assertEqual(Follow.objects.count(), follow_count)
+        self.assertRedirects(response, follow_guest_redirect)
+
     def test_authorized_client_can_follow(self):
         follow_count = Follow.objects.count()
         self.author_client.get(

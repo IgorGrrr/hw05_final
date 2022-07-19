@@ -8,7 +8,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
 
 from posts.models import Post, Group
-from posts.forms import PostForm
+from posts.forms import PostForm, CommentForm
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
@@ -114,7 +114,9 @@ class PostsPagesTests(TestCase):
                 kwargs={'post_id': self.post.id}
             )
         )
-        self.assertEqual(response.context.get('post').text, 'Тестовый пост')
+        form = response.context.get('form')
+        self.assertIsInstance(form, CommentForm)
+        self.assertEqual(response.context.get('post'), self.post)
 
     def test_create_post_page_show_correct_context(self):
         """Шаблон create_post сформирован с правильным контекстом."""
@@ -235,3 +237,17 @@ class PaginatorViewsTest(TestCase):
                 kwargs={'username': self.user.username}) + '?page=2'
         )
         self.assertEqual(len(response.context['page_obj']), 3)
+
+    def test_home_page_cache(self):
+        Post.objects.create(text='Тестовый текст',
+                            author=self.user,
+                            group=self.group
+                            )
+        response = self.guest_client.get(reverse('posts:home'))
+        last_object = Post.objects.latest('id')
+        last_object.delete()
+        response_cache = self.guest_client.get(reverse('posts:home'))
+        cache.clear()
+        response_no_cache = self.guest_client.get(reverse('posts:home'))
+        self.assertEqual(response.content, response_cache.content)
+        self.assertNotEqual(response.content, response_no_cache.content)
