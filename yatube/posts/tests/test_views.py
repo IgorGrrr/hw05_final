@@ -1,7 +1,8 @@
 import tempfile
 import shutil
+
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -14,7 +15,7 @@ TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 User = get_user_model()
 
-
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostsPagesTests(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -169,6 +170,20 @@ class PostsPagesTests(TestCase):
         response = self.authorized_client.get(wrong_page)
         self.assertNotIn(new_post, response.context['page_obj'])
 
+    def test_home_page_cache(self):
+            Post.objects.create(text='Тестовый текст',
+                                author=self.user,
+                                group=self.group
+                                )
+            response = self.guest_client.get(reverse('posts:home'))
+            last_object = Post.objects.latest('id')
+            last_object.delete()
+            response_cache = self.guest_client.get(reverse('posts:home'))
+            cache.clear()
+            response_no_cache = self.guest_client.get(reverse('posts:home'))
+            self.assertEqual(response.content, response_cache.content)
+            self.assertNotEqual(response.content, response_no_cache.content)
+
 
 class PaginatorViewsTest(TestCase):
     @classmethod
@@ -237,17 +252,3 @@ class PaginatorViewsTest(TestCase):
                 kwargs={'username': self.user.username}) + '?page=2'
         )
         self.assertEqual(len(response.context['page_obj']), 3)
-
-    def test_home_page_cache(self):
-        Post.objects.create(text='Тестовый текст',
-                            author=self.user,
-                            group=self.group
-                            )
-        response = self.guest_client.get(reverse('posts:home'))
-        last_object = Post.objects.latest('id')
-        last_object.delete()
-        response_cache = self.guest_client.get(reverse('posts:home'))
-        cache.clear()
-        response_no_cache = self.guest_client.get(reverse('posts:home'))
-        self.assertEqual(response.content, response_cache.content)
-        self.assertNotEqual(response.content, response_no_cache.content)
