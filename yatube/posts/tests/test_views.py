@@ -171,18 +171,18 @@ class PostsPagesTests(TestCase):
         self.assertNotIn(new_post, response.context['page_obj'])
 
     def test_home_page_cache(self):
-            Post.objects.create(text='Тестовый текст',
-                                author=self.user,
-                                group=self.group
-                                )
-            response = self.guest_client.get(reverse('posts:home'))
-            last_object = Post.objects.latest('id')
-            last_object.delete()
-            response_cache = self.guest_client.get(reverse('posts:home'))
-            cache.clear()
-            response_no_cache = self.guest_client.get(reverse('posts:home'))
-            self.assertEqual(response.content, response_cache.content)
-            self.assertNotEqual(response.content, response_no_cache.content)
+        Post.objects.create(text='Тестовый текст',
+                            author=self.user,
+                            group=self.group
+        )
+        response = self.guest_client.get(reverse('posts:home'))
+        last_object = Post.objects.latest('id')
+        last_object.delete()
+        response_cache = self.guest_client.get(reverse('posts:home'))
+        cache.clear()
+        response_no_cache = self.guest_client.get(reverse('posts:home'))
+        self.assertEqual(response.content, response_cache.content)
+        self.assertNotEqual(response.content, response_no_cache.content)
 
 
 class PaginatorViewsTest(TestCase):
