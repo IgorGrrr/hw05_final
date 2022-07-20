@@ -15,6 +15,7 @@ TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 User = get_user_model()
 
+
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostsPagesTests(TestCase):
     @classmethod
@@ -173,8 +174,7 @@ class PostsPagesTests(TestCase):
     def test_home_page_cache(self):
         Post.objects.create(text='Тестовый текст',
                             author=self.user,
-                            group=self.group
-        )
+                            group=self.group)
         response = self.guest_client.get(reverse('posts:home'))
         last_object = Post.objects.latest('id')
         last_object.delete()
